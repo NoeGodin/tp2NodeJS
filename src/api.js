@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto'
 
-
+const publicKey = "20325225b79800ba9154997635e48e1e"
+const privateKey = "e8b400f8a2553e0068a77e22caeeeb036d4d70d0"
 /**
  * Récupère les données de l'endpoint en utilisant les identifiants
  * particuliers developer.marvels.com
@@ -7,7 +9,29 @@
  * @return {Promise<json>}
  */
 export const getData = async (url) => {
-    // A Compléter
+    const ts = new Date().getTime()
+    const hash = await getHash(publicKey,privateKey,ts)
+    const req = "https://gateway.marvel.com:443/v1/public/characters?"+ new URLSearchParams({
+        ts:ts,
+        apikey:publicKey,
+        hash:hash
+        });
+    const response = await fetch(req);
+    const body = await response.json();
+    const marvelChar = body.data.results;
+    const thumbnailMarvelChar = [];
+    const thumbnailNotAvailable = 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available';
+    for(let i = 0; i < marvelChar.length; i++) {
+        if(marvelChar[i].hasOwnProperty("thumbnail")) {
+            if (marvelChar[i].thumbnail.path !== thumbnailNotAvailable) {
+                thumbnailMarvelChar.push(marvelChar[i])
+            }
+        }
+    }
+    return thumbnailMarvelChar.map(char => ({
+        name: char.name,
+        imageUrl: char.thumbnail.path+"/portrait_xlarge."+char.thumbnail.extension
+    }));
 }
 
 /**
@@ -19,5 +43,5 @@ export const getData = async (url) => {
  * @return {Promise<ArrayBuffer>} en hexadecimal
  */
 export const getHash = async (publicKey, privateKey, timestamp) => {
-    // A compléter
+    return createHash('md5').update(timestamp+privateKey+publicKey).digest("hex");
 }

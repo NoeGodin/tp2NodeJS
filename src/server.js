@@ -1,1 +1,30 @@
-console.log("Je suis Marvel")
+
+import {createServer} from "node:http"
+import {getData} from "./api.js";
+
+createServer(async (req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        const url = new URL(req.url, `http://${req.headers.host}`)
+        const endpoint = `${req.method}:${url.pathname}`
+        let results
+        try {
+            switch (endpoint) {
+                case 'GET:/marvel':
+                    results = await getData();
+                    break;
+                default :
+                    res.writeHead(404)
+            }
+            if (results) {
+                res.write(JSON.stringify(results))
+            }
+        } catch (erreur) {
+            if (erreur instanceof NotFoundError) {
+                res.writeHead(404)
+            } else {
+                throw erreur
+            }
+        }
+        res.end()
+    }
+).listen(3000)
