@@ -1,30 +1,37 @@
+    import Fastify from 'fastify'
+    import handlebars from 'handlebars';
+    import fastifyView from '@fastify/view';
+    import { getData } from './api.js';
 
-import {createServer} from "node:http"
-import {getData} from "./api.js";
+    const fastify = Fastify({
+        logger: true
+    })
 
-createServer(async (req, res) => {
-        res.setHeader('Content-Type', 'application/json')
-        const url = new URL(req.url, `http://${req.headers.host}`)
-        const endpoint = `${req.method}:${url.pathname}`
-        let results
-        try {
-            switch (endpoint) {
-                case 'GET:/marvel':
-                    results = await getData();
-                    break;
-                default :
-                    res.writeHead(404)
-            }
-            if (results) {
-                res.write(JSON.stringify(results))
-            }
-        } catch (erreur) {
-            if (erreur instanceof NotFoundError) {
-                res.writeHead(404)
-            } else {
-                throw erreur
+    fastify.register(fastifyView, {
+        engine: {
+            handlebars,
+        },
+        includeViewExtension: true,
+        templates: 'templates',
+        options: {
+            partials: {
+                header: 'header.hbs',
+                footer: 'footer.hbs'
             }
         }
-        res.end()
+    });
+
+    // Declare a route
+    fastify.get('/', async function handler (request, reply) {
+        const characters = await getData("https://gateway.marvel.com:443/v1/public/characters");
+        console.log(characters)
+        return reply.view('index.hbs', { characters });
+    })
+
+    // Run the server!
+    try {
+        await fastify.listen({ port: 3000 })
+    } catch (err) {
+        fastify.log.error(err)
+        process.exit(1)
     }
-).listen(3000)

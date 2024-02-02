@@ -1,11 +1,22 @@
-
+{{> header}}
 <div class="container-fluid m-2 p-5 bg-primary text-center">
     <h1>Les Marvels</h1>
+</div>
+<div class='row'>
+    {{#each characters}}
+        <div class="card" style="width: 18rem;">
+        <img src="{{imageUrl}}" class='card-img-top' alt="{{name}}">
+          <div class="card-body">
+            <h5 class="card-title">{{name}}</h5>
+          </div>
+        </div>
+    {{/each}}
 </div>
 <div class="container m-2 p-5 bg-primary  text-center">
     <h2>Mes comics</h2>
 
 </div>
+{{> footer}}
 
 
 

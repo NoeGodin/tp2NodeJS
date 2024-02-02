@@ -11,7 +11,7 @@ const privateKey = "e8b400f8a2553e0068a77e22caeeeb036d4d70d0"
 export const getData = async (url) => {
     const ts = new Date().getTime()
     const hash = await getHash(publicKey,privateKey,ts)
-    const req = "https://gateway.marvel.com:443/v1/public/characters?"+ new URLSearchParams({
+    const req = url+"?"+ new URLSearchParams({
         ts:ts,
         apikey:publicKey,
         hash:hash
