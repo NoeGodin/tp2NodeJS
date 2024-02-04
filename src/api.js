@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto'
+import dotenv from "dotenv"
+dotenv.config();
 
-const publicKey = "20325225b79800ba9154997635e48e1e"
-const privateKey = "e8b400f8a2553e0068a77e22caeeeb036d4d70d0"
+const publicKey = process.env.PUBKEY
+const privateKey = process.env.PRIVKEY
 /**
  * Récupère les données de l'endpoint en utilisant les identifiants
  * particuliers developer.marvels.com
